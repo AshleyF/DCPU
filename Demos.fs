@@ -1,55 +1,28 @@
-DCPU
-====
+﻿module Demos
 
-This is Notch's DCPU-16 in a few lines of F#.
+open DCPU
 
-My son is completely obsessed with Minecraft. It’s an amazing game and the way he plays it, it really nurtures extreme creativity. I honestly haven’t been able to get into it myself but I was pretty intrigued by the ComputerCraft mod which allows you to script the game in Lua. I thought it might be a good way to introduce my son to programming.
+let boot (image : int list) =
+    for i in 0 .. image.Length - 1 do
+        memory.[i] <- uint16 image.[i]
+    cycle ()
 
-Even better, just today Notch announced his latest game and it looks like it will revolve around programming a 1980’s style 16-bit computer! Based on the spec at the site, I just couldn’t resist implementing the DCPU-16 in F# :) I can’t wait for the game to come out!
-
-I’m completely astonished at how quickly a community has sprung up around Notch’s DCPU-16. In the first 24 hours there were already tens of implementations in various languages (including mine). Now there’s a web-based IDE, a whole C compiler/assembler tool chain, an LLVM backend, … It’s craziness!
-
-## I/O
-
-So I’m way behind in the times (almost a week has gone by!), but I’m now adding I/O to my emulator. Notch has yet to officially publish any I/O specs, but there seems to be a de facto standard. Input is a 16-cell ring buffer at 0x9000 and video is 32x12 cells memory mapped at 0x8000 with characters and foreground/background colors encoded in the high byte. I’ll support everything from this spec (in 25 lines of F#!) except fonts and blinking; just using the standard console. You could modify to load an image from a file and use with the DCPU Toolchain if you like.
-
-## Forth
-
-I still have no assembler. I’m working on a Forth instead. For now just straight machine code (fun!). 
-
-Matt Hellige beat me to it! Check out [his GoForth](https://github.com/hellige/dcpu/tree/master/forth). It can be used with this DCPU implementation with:
-
-```fsharp
-// Load Matt Hellige's GoForth! Image file from http://matt.immute.net/files/goforth/goforth.img
-let image = File.ReadAllBytes @"..\..\goforth.img"
-```
-
-## Demos
-
-For a quick demo, let’s just take a couple of samples from the wonderful https://0x10co.de site [gone now, I believe]:
-
-```fsharp
+(*
 // Screen test (see https://0x10co.de/y5096)
 boot [0x7c01; 0xf030; 0x7c61; 0x8000; 0x7c0c; 0xf838; 0x7c03; 0xf000
       0x7c0c; 0x0a3a; 0x9c02; 0x00e1; 0x7c02; 0x0101; 0x8462; 0x19fe
       0x8010; 0x7dc1; 0x0004; 0x0020; 0x0000] 
-```
+*)
 
-![Streen Test](screen.png)
-
-```fsharp
 // Psychedelic Screensaver (see https://0x10co.de/4r80g)
 boot [0x7801; 0x002c; 0x7c10; 0x0025; 0x01e1; 0x002c; 0x0011; 0x7c16
       0x004f; 0x7c12; 0x0021; 0x7801; 0x002d; 0x7c10; 0x0025; 0x01e1
       0x002d; 0x7c09; 0xf000; 0x001a; 0x7801; 0x002e; 0x7c10; 0x0025
       0x01e1; 0x002e; 0x7c06; 0x0180; 0x0501; 0x8000; 0x8071; 0x8472
       0x1f4e; 0x7dc1; 0x001f; 0x7dc1; 0x0000; 0x19a1; 0x0061; 0x1864
-      0x946a; 0x1802; 0x6061; 0x61c1; 0x3241; 0x3432; 0x2837; 0x0000] 
-```
+      0x946a; 0x1802; 0x6061; 0x61c1; 0x3241; 0x3432; 0x2837; 0x0000]
 
-![Psychedelic Screensaver](psychedelic.png)
-
-```fsharp
+(*
 // Keyboard test (see https://0x10co.de/h6bbv)
 boot [0x7c01; 0x8000; 0x8021; 0x8011; 0x4811; 0x0063; 0x781a; 0x0062
       0x0481; 0x8402; 0x8422; 0x812d; 0x0063; 0x7dc1; 0x0004; 0x81ec
@@ -66,11 +39,9 @@ boot [0x7c01; 0x8000; 0x8021; 0x8011; 0x4811; 0x0063; 0x781a; 0x0062
       0x8000; 0x61c1; 0x2000; 0x0054; 0x0079; 0x0070; 0x0065; 0x0020
       0x0073; 0x006f; 0x006d; 0x0065; 0x0074; 0x0068; 0x0069; 0x006e
       0x0067; 0x0021; 0x0000; 0x0000]
-```
+*)
 
-![Keyboard Test](keyboard.png)
-
-```fsharp
+(*
 // Matrix Screen Saver (see https://0x10co.de/gpoke)
 boot [0x7c51; 0x1234; 0x1441; 0x7dc1; 0x0009; 0x7c44; 0x274d; 0x8442
       0x61c1; 0x8061; 0x1031; 0x1441; 0x7c01; 0x8000; 0x8071; 0x7c10
@@ -96,8 +67,15 @@ boot [0x7c51; 0x1234; 0x1441; 0x7dc1; 0x0009; 0x7c44; 0x274d; 0x8442
       0x004a; 0x004a; 0x0049; 0x0058; 0x002d; 0x0020; 0x007e; 0x007e
       0x006f; 0x0069; 0x0077; 0x006c; 0x0072; 0x006b; 0x006d; 0x002f
       0x002f; 0x005c; 0x0027; 0x005b; 0x005d; 0x005e; 0x0029; 0x0060] 
-```
+*)
 
-![Matrix Screensaver](matrix.png)
+(*
+// Load Matt Hellige's GoForth!
+// Image file from http://matt.immute.net/files/goforth/goforth.img (may be gone now)
+// Or build from his repo: http://github.com/hellige/dcpu)
+let image = System.IO.File.ReadAllBytes @"..\..\goforth.img"
+for i in 0 .. 2 .. image.Length - 1 do
+    memory.[i / 2] <- (uint16 image.[i]) <<< 8 ||| uint16 image.[i + 1]
+cycle ()
+*)
 
-Pretty fun stuff!

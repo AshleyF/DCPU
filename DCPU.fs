@@ -1,5 +1,6 @@
-﻿open System
-open System.IO
+﻿module DCPU
+
+open System
 
 let memory = Array.create 0x10000 0us
 
@@ -83,12 +84,3 @@ let rec cycle () =
     | 0xe -> fif (<=) // IFG
     | 0xf -> fif (fun x y -> x &&& y = 0) // IFB
     cycle ()
-
-// Load Matt Hellige's GoForth!
-// Image file from http://matt.immute.net/files/goforth/goforth.img
-// See also https://github.com/hellige/dcpu)
-let image = File.ReadAllBytes @"..\..\goforth.img"
-for i in 0 .. 2 .. image.Length - 1 do
-    memory.[i / 2] <- (uint16 image.[i]) <<< 8 ||| uint16 image.[i + 1]
-
-cycle ()
